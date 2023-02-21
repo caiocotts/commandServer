@@ -60,7 +60,17 @@ int exec(char **args) {
             return (subroutines[i].func)(args);
         }
     }
-    return system(args[0]);
+
+    char *cmd = malloc(1);
+    int cmdsize = strlen(cmd);
+    for (int i = 0; args[i]; ++i) {
+        cmd = realloc(cmd, cmdsize + strlen(args[i]));
+        char *spacer = malloc(strlen(args[i] + 1));
+        sprintf(spacer, " %s", args[i]);
+        strcat(cmd, spacer);
+    }
+    
+    return system(cmd);
 }
 
 void sig_interrupt_handler() {
@@ -79,7 +89,7 @@ _Noreturn void shell_loop() {
         line = read_line();
         args = parse(line);
         status = exec(args);
-        printf("exit status: %d - %s\n", WEXITSTATUS(status), strerror(WEXITSTATUS(status)) );
+        printf("exit status: %d - %s\n", WEXITSTATUS(status), strerror(WEXITSTATUS(status)));
 
     } while (true);
 }
