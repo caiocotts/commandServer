@@ -1,8 +1,13 @@
-main: main.o
-	cc main.o -o cmdserver -lreadline
+TARGET = cmdserver
+SOURCES = main.c shell.c subroutines.c
+HEADERS = shell.h subroutines.h
 
-main.o: main.c shell.h subroutines.h
-	cc main.c -c
+all: $(TARGET)
+.PHONY: all
+
+$(TARGET): $(HEADERS) $(SOURCES)
+	cc -o $(TARGET) $(SOURCES) -g3 -lreadline
 
 clean:
-	rm -f *o	
+	rm -f $(TARGET)
+.PHONY: clean
