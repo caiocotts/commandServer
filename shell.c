@@ -1,11 +1,12 @@
+#include "shell.h"
+#include "subroutines.h"
+#include <limits.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <signal.h>
-#include <stdio.h>
-#include "subroutines.h"
-#include "shell.h"
-
+#include <unistd.h>
 
 char *read_line() {
     char *line = NULL;
@@ -59,10 +60,10 @@ int exec(char **args) {
     }
 
     char *cmd = malloc(1);
-    int cmdsize = strlen(cmd);
+    size_t cmdsize = strlen(cmd);
     for (int i = 0; args[i]; ++i) {
         cmd = realloc(cmd, cmdsize + strlen(args[i]));
-        char *spacer = malloc(strlen(args[i] + 1));
+        char *spacer = malloc(strlen(args[i]) + 1);
         sprintf(spacer, " %s", args[i]);
         strcat(cmd, spacer);
     }
@@ -82,11 +83,13 @@ _Noreturn void shell_loop() {
     signal(SIGINT, sig_interrupt_handler);
 
     do {
-        printf("> ");
+        char cwd[PATH_MAX];
+        printf("%s> ", getcwd(cwd, sizeof cwd));
         line = read_line();
         args = parse(line);
         status = exec(args);
-        printf("exit status: %d - %s\n", WEXITSTATUS(status), strerror(WEXITSTATUS(status)));
+        printf("exit status: %d - %s\n", WEXITSTATUS(status),
+               strerror(WEXITSTATUS(status)));
 
     } while (true);
 }

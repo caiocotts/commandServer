@@ -9,4 +9,4 @@ int exec(char **args);
 
 void sig_interrupt_handler();
 
-_Noreturn void shell_loop();
+void shell_loop();

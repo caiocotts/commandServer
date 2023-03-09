@@ -1,4 +1,9 @@
+//#include <linux/limits.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <linux/limits.h>
 
 int export_cmd() {
     puts("export is not implemented");
@@ -10,8 +15,16 @@ int unset_cmd() {
     return 0;
 }
 
-int chdir_cmd() {
-    puts("chdir is not implemented");
+int chdir_cmd(char **args) {
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof cwd);
+    setenv("OLDPWD", cwd, 1);
+    char *dirPath = args[1];
+    if (strcmp(dirPath, "-") == 0) {
+        chdir(getenv("OLDPWD"));
+        return 0;
+    }
+    chdir(dirPath);
     return 0;
 }
 
@@ -39,4 +52,3 @@ int ln_cmd() {
     puts("ln is not implemented");
     return 0;
 }
-
