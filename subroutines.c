@@ -1,17 +1,16 @@
-//#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <linux/limits.h>
 
-int export_cmd() {
-    puts("export is not implemented");
+int export_cmd(char **args) {
+    putenv(args[1]);
     return 0;
 }
 
-int unset_cmd() {
-    puts("unset is not implemented");
+int unset_cmd(char **args) {
+    putenv(args[1]);
     return 0;
 }
 
