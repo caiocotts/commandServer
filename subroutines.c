@@ -21,10 +21,18 @@ int chdir_cmd(char **args) {
     setenv("OLDPWD", cwd, 1);
     char *dirPath = args[1];
     if (strcmp(dirPath, "-") == 0) {
-        chdir(getenv("OLDPWD"));
+        int status = chdir(getenv("OLDPWD"));
+        if (status != 0) {
+             perror("chdir");
+             return status;
+        }
         return 0;
     }
-    chdir(dirPath);
+    int status = chdir(dirPath);
+    if (status != 0) {
+        perror("chdir");
+        return status;
+    }
     return 0;
 }
 
@@ -40,8 +48,9 @@ int chmod_cmd(char **args) {
         int status = chmod(args[i], permission);
         if (status != 0) {
             printf("%s\n", strerror(status)); // I don't understand why use strerror on chmod
-                                                          // given that it can only return 0 or -1, but here it
-                                                          // is anyways I guess. The printf will always display "unknown error -1" on an error.
+            // given that it can only return 0 or -1, but here it
+            // is anyways I guess. The printf will always display "unknown error -1" on an error.
+            // perror makes more sense in this context.
         }
         return status;
     }
