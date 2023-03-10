@@ -12,7 +12,7 @@ int chmod_cmd(char **args);
 
 int path_cmd();
 
-int touch_cmd();
+int touch_cmd(char **args);
 
 int ln_cmd();
 
