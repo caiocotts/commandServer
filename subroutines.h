@@ -8,7 +8,7 @@ int chdir_cmd(char **args);
 
 int access_cmd();
 
-int chmod_cmd();
+int chmod_cmd(char **args);
 
 int path_cmd();
 

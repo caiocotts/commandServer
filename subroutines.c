@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <linux/limits.h>
+#include <sys/stat.h>
 
 int export_cmd(char **args) {
     putenv(args[1]);
@@ -32,8 +33,18 @@ int access_cmd() {
     return 0;
 }
 
-int chmod_cmd() {
-    puts("chmod is not implemented");
+int chmod_cmd(char **args) {
+    long permission = strtol(args[1], NULL, 8);
+    chmod(args[2], permission);
+    for (int i = 2; NULL != args[i]; i++) {
+        int status = chmod(args[i], permission);
+        if (status != 0) {
+            printf("%s\n", strerror(status)); // I don't understand why use strerror on chmod
+                                                          // given that it can only return 0 or -1, but here it
+                                                          // is anyways I guess. The printf will always display "unknown error -1" on an error.
+        }
+        return status;
+    }
     return 0;
 }
 
