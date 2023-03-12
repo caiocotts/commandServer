@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/time.h>
-#include <time.h>
+#include <errno.h>
 
 int export_cmd(char **args) {
     putenv(args[1]);
@@ -20,24 +20,31 @@ int unset_cmd(char **args) {
 
 int chdir_cmd(char **args) {
     char cwd[PATH_MAX];
-    getcwd(cwd, sizeof cwd);
-    setenv("OLDPWD", cwd, 1);
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd");
+        return errno;
+    }
+
+    if (setenv("OLDPWD", cwd, 1) != 0) {
+        perror("setenv");
+        return errno;
+    }
+
     char *dirPath = args[1];
     if (strcmp(dirPath, "-") == 0) {
-        int status = chdir(getenv("OLDPWD"));
-        if (status != 0) {
+        if (chdir(getenv("OLDPWD")) != 0) {
             perror("chdir");
-            return status;
+            return errno;
         }
-        return 0;
-    }
-    int status = chdir(dirPath);
-    if (status != 0) {
-        perror("chdir");
-        return status;
+    } else {
+        if (chdir(dirPath) != 0) {
+            perror("chdir");
+            return errno;
+        }
     }
     return 0;
 }
+
 
 int access_cmd() {
     puts("access is not implemented");

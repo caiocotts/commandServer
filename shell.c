@@ -32,12 +32,12 @@ char **parse(char *line) {
 
     token = strtok(line, DELIMITER);
     while (token != NULL) {
-        tokens[pos] = token;
+        tokens[pos] = strdup(token);
         pos++;
         if (pos >= bufsize) {
             bufsize += BUFSIZE;
             tokens_backup = tokens;
-            tokens = realloc(tokens, bufsize * sizeof(char *));
+            tokens = reallocarray(tokens, bufsize, sizeof(char *));
             if (!tokens) {
                 free(tokens_backup);
                 exit(EXIT_FAILURE);
@@ -53,22 +53,25 @@ int exec(char **args) {
     if (args[0] == NULL) {
         return EXIT_SUCCESS;
     }
+
     for (int i = 0; subroutines[i].name; i++) {
         if (strcasecmp(args[0], subroutines[i].name) == 0) {
             return (subroutines[i].func)(args);
         }
     }
 
-    char *cmd = malloc(1);
-    size_t cmdsize = strlen(cmd);
-    for (int i = 0; args[i]; ++i) {
-        cmd = realloc(cmd, cmdsize + strlen(args[i]));
-        char *spacer = malloc(strlen(args[i]) + 1);
-        sprintf(spacer, " %s", args[i]);
-        strcat(cmd, spacer);
+    char *cmd = malloc(strlen(args[0]) + 1);
+    strcpy(cmd, args[0]);
+    for (int i = 1; args[i]; ++i) {
+        cmd = realloc(cmd, strlen(cmd) + strlen(args[i]) + 2);
+        strcat(cmd, " ");
+        strcat(cmd, args[i]);
     }
 
-    return system(cmd);
+    int result = system(cmd);
+    free(cmd);
+
+    return result;
 }
 
 void sig_interrupt_handler() {
